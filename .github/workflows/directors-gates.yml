@@ -5,15 +5,12 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-      # Secret scan (lightweight grep; replace with org tool later)
       - name: Secret scan (light)
         run: |
           ! grep -RInE '\bsk-[A-Za-z0-9_-]{20,}\b' . || { echo "OpenAI-like key found"; exit 1; }
           ! grep -RInE 'API_KEY=|SECRET=|TOKEN=' . || { echo "Generic secret token marker found"; exit 1; }
-      # Port/Path guard (allow only 8787 API, 5173 UI mentions)
-      - name: Port guard
+      - name: Port guard (allow only 8787/5173)
         run: |
           ! grep -RInE '127\.0\.0\.1:(?!8787|5173)\d{4}' . || { echo "Forbidden local port used"; exit 1; }
-      # Constitution presence (Acts as a governance anchor)
       - name: Constitution present
         run: test -f docs/NXT_GROUP_CONSTITUTION_v6.md
